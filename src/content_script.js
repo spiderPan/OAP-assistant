@@ -1,6 +1,12 @@
 ﻿(function() {
 var thisUrl = document.URL;
-if(  thisUrl.indexOf('mail.google.com') >= 0 ||thisUrl.indexOf('plus.google.com') >= 0){
+if( thisUrl.indexOf('oap.apprenticelms.ca') < 0 ){
   return;	
 }
+
+jQuery(function(){
+	console.log('gogogo OAP');
+	
+});
+
 })();
