@@ -1,19 +1,29 @@
 (function() {
     jQuery(function($) {
-        var thisUrl = document.URL;
+		Firebase.enableLogging(true);
+        var thisUrl = document.URL,
+		    myFirebaseRef = new Firebase('https://resplendent-heat-2275.firebaseio.com/');
+
         if (thisUrl.indexOf('oap.apprenticelms.ca') < 0) {
             return;
         }
 
+		if (thisUrl.indexOf('/course/view') >= 0) {
+            //Course Landing Page
+            ReadFireBase();
+        }
+		
         if (thisUrl.indexOf('quiz/review') >= 0) {
             //Review Page
             SetLocalStorage();
         }
 
+		
 
         if (thisUrl.indexOf('quiz/attempt') >= 0) {
             //Quiz Page
             CheckReviewInfo();
+			ReadFireBase();
         }
 
         function SetLocalStorage() {
@@ -96,6 +106,12 @@
                 return {};
             }
         }
-    });
+    
+		function ReadFireBase(){
+			myFirebaseRef.child("location").on("value", function(snapshot) {
+				alert(snapshot.val());  // Alerts "San Francisco"
+			});
+		}
+	});
 
 })();
