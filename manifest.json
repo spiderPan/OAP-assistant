@@ -1,27 +1,28 @@
 ﻿{
-  "name": "OAP-assistant",
-  "version": "1.7.5",
-  "description": "OAP-assistant",
-  "manifest_version": 2,
-  "permissions": ["webRequest", "activeTab","tabs", "webRequestBlocking",
-                  "<all_urls>"],
-  "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com; object-src 'self'",
-  "background": {
-    "scripts": ["src/content_script.js"]
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "css": ["src/content_style.css"],
-      "js": ["src/jquery-2.1.0.min.js","src/firebase.js", "src/content_script.js"],
-	  "run_at": "document_start"
+    "name": "OAP-assistant",
+    "version": "1.7.5",
+    "description": "OAP-assistant",
+    "manifest_version": 2,
+    "permissions": [
+        "webRequest",
+        "activeTab",
+        "tabs",
+        "webRequestBlocking",
+        "<all_urls>"
+    ],
+    "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com; object-src 'self'",
+    "background": {
+        "page": "src/bg/background.html",
+        "persistent": true
+    },
+    "browser_action": {
+        "default_icon": "icons/icon19.png",
+        "default_title": "browser action",
+        "default_popup": "src/browser_action/browser_action.html"
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
     }
-  ],
-  "web_accessible_resources": [
-      
-  ],
-  "icons" : {
-   
-  }
-
 }
