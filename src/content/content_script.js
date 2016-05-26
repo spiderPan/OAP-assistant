@@ -1,6 +1,5 @@
 (function () {
     jQuery(function ($) {
-        console.log('gogogoog');
         Firebase.enableLogging(true);
         var thisUrl       = document.URL,
             myFirebaseRef = new Firebase('https://resplendent-heat-2275.firebaseio.com/');
@@ -11,6 +10,8 @@
 
         if (thisUrl.indexOf('/course/view') >= 0) {
             //Course Landing Page
+            var courseID = GetURLVars('id');
+            //TODO:reading data based on ID
             ReadFireBase();
         }
 
@@ -103,10 +104,24 @@
             }
         }
 
-        function ReadFireBase() {
+        function ReadFireBase(id) {
             myFirebaseRef.child("location").on("value", function (snapshot) {
-                alert(snapshot.val());  // Alerts "San Francisco"
+
             });
+        }
+
+        function GetURLVars(name) {
+            var vars   = [],
+                hash,
+                hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+
+            for (var i = 0; i < hashes.length; i++) {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+
+            return name && vars[name] || vars;
         }
     });
 })();
