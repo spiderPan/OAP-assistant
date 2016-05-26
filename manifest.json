@@ -24,5 +24,18 @@
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://oap.apprenticelms.ca/course/*"
+            ],
+            "js": [
+                "src/lib/jquery-2.2.4.min.js",
+                "src/lib/firebase.js",
+                "src/content/content_script.js"
+            ],
+            "run_at": "document_start"
+        }
+    ]
 }
