@@ -40,7 +40,7 @@
 
             questionList.each(function (e) {
                 var _this       = $(this),
-                    questions   = _this.find('.qtext p').html().trim(),
+                    questions   = _this.find('.qtext').text().trim(),
                     answers     = _this.find('.answer .r0, .answer .r1'),
                     contentWrap = _this.find('.content');
 
@@ -53,7 +53,7 @@
                         //TODO: Highlight the correct result
                         answers.each(function (e) {
                             var _that       = $(this),
-                                answerLabel = _that.find('label').html().trim();
+                                answerLabel = _that.find('label').text().trim();
 
                             if (answerLabel.indexOf(correctAnswer) > -1) {
                                 _that.addClass('correct');
@@ -73,8 +73,8 @@
 
             resultLists.each(function (e) {
                 var _this     = $(this),
-                    questions = _this.find('.qtext p').html().trim(),
-                    answer    = _this.find('.rightanswer').html().trim();
+                    questions = _this.find('.qtext').text().trim(),
+                    answer    = _this.find('.rightanswer').text().trim();
                 reviewInfo[questions] = answer;
             });
 
