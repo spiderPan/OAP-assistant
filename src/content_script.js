@@ -1,96 +1,111 @@
-(function () {
-    jQuery(function ($) {
-        var thisUrl = document.URL;
-        if (thisUrl.indexOf('oap.apprenticelms.ca') < 0) {
-            return;
+(function() {
+  jQuery(function($) {
+    var thisUrl = document.URL;
+    if (thisUrl.indexOf('oap.apprenticelms.ca') < 0) {
+      return;
+    }
+
+    if (thisUrl.indexOf('quiz/review') >= 0) {
+      //Review Page
+      SetLocalStorage();
+    }
+
+    if (thisUrl.indexOf('quiz/attempt') >= 0) {
+      //Quiz Page
+      CheckReviewInfo();
+    }
+
+    function SetLocalStorage() {
+      var cachedInfo = GetLocalStorage(),
+        reviewInfo = GetReviewInfo();
+
+      if (null === cachedInfo) {
+        cachedInfo = {};
+      }
+
+      for (var i in cachedInfo) {
+        if (reviewInfo.hasOwnProperty(i)) {
+          delete reviewInfo.i;
         }
+      }
 
-        if (thisUrl.indexOf('quiz/review') >= 0) {
-            //Review Page
-            SetLocalStorage();
-        }
+      /*TODO: compare the two objects and delete the duplicated keys then merged into the localStorage*/
+      $.extend(cachedInfo, reviewInfo);
+      localStorage.setItem('OAP-info', JSON.stringify(cachedInfo));
+    }
 
-        if (thisUrl.indexOf('quiz/attempt') >= 0) {
-            //Quiz Page
-            CheckReviewInfo();
-        }
+    function CheckReviewInfo() {
+      var questionList = $('.deferredfeedback'),
+        cachedInfo = GetLocalStorage();
 
-        function SetLocalStorage() {
-            var cachedInfo = GetLocalStorage(),
-                reviewInfo = GetReviewInfo();
+      questionList.each(function(e) {
+        var _this = $(this),
+          questions = hashCode(_this.find('.qtext').text().trim()),
+          answers = _this.find('.answer .r0, .answer .r1'),
+          contentWrap = _this.find('.content');
 
-            if (null === cachedInfo) {
-                cachedInfo = {};
-            }
+        for (var q in cachedInfo) {
+          if (questions == q) {
+            /*TODO: Improve comparison*/
+            contentWrap.append('<p class="outcome">DUDE! <strong>' + cachedInfo[q] + '</strong></p>');
+            var correctAnswer = cachedInfo[q].replace('The correct answer is', '').replace(/'/g, '').replace(':', '').replace('.', '').trim();
 
-            for (var i in cachedInfo) {
-                if (reviewInfo.hasOwnProperty(i)) {
-                    delete reviewInfo.i;
-                }
-            }
+            //TODO: Highlight the correct result
+            answers.each(function(e) {
+              var _that = $(this),
+                answerLabel = _that.find('label').text().trim();
 
-            /*TODO: compare the two objects and delete the duplicated keys then merged into the localStorage*/
-            $.extend(cachedInfo, reviewInfo);
-            localStorage.setItem('OAP-info', JSON.stringify(cachedInfo));
-        }
-
-        function CheckReviewInfo() {
-            var questionList = $('.deferredfeedback'),
-                cachedInfo   = GetLocalStorage();
-
-            questionList.each(function (e) {
-                var _this       = $(this),
-                    questions   = _this.find('.qtext').text().trim(),
-                    answers     = _this.find('.answer .r0, .answer .r1'),
-                    contentWrap = _this.find('.content');
-
-                for (var q in cachedInfo) {
-                    if (questions == q) {
-                        /*TODO: Improve comparison*/
-                        contentWrap.append('<p class="outcome">DUDE! <strong>' + cachedInfo[q] + '</strong></p>');
-                        var correctAnswer = cachedInfo[q].replace('The correct answer is', '').replace(/'/g, '').replace(':', '').replace('.', '').trim();
-
-                        //TODO: Highlight the correct result
-                        answers.each(function (e) {
-                            var _that       = $(this),
-                                answerLabel = _that.find('label').text().trim();
-
-                            if (answerLabel.indexOf(correctAnswer) > -1) {
-                                _that.addClass('correct');
-                            }
-
-                        });
-                    }
-                }
+              if (answerLabel.indexOf(correctAnswer) > -1) {
+                _that.addClass('correct');
+              }
 
             });
-
+          }
         }
 
-        function GetReviewInfo() {
-            var resultLists = $('.deferredfeedback'),
-                reviewInfo  = {};
+      });
 
-            resultLists.each(function (e) {
-                var _this     = $(this),
-                    questions = _this.find('.qtext').text().trim(),
-                    answer    = _this.find('.rightanswer').text().trim();
-                reviewInfo[questions] = answer;
-            });
+    }
 
-            console.log(reviewInfo);
-            return reviewInfo;
-        }
+    function GetReviewInfo() {
+      var resultLists = $('.deferredfeedback'),
+        reviewInfo = {};
 
-        function GetLocalStorage() {
-            var cachedInfo = localStorage.getItem('OAP-info');
+      resultLists.each(function(e) {
+        var _this = $(this),
+          questions = hashCode(_this.find('.qtext').text().trim()),
+          answer = _this.find('.rightanswer').text().trim();
+        reviewInfo[questions] = answer;
+      });
 
-            if (cachedInfo) {
-                return JSON.parse(cachedInfo);
-            } else {
-                localStorage.setItem('OAP-info', null);
-                return {};
-            }
-        }
-    });
+      console.log(reviewInfo);
+      return reviewInfo;
+    }
+
+    function GetLocalStorage() {
+      var cachedInfo = localStorage.getItem('OAP-info');
+
+      if (cachedInfo) {
+        return JSON.parse(cachedInfo);
+      } else {
+        localStorage.setItem('OAP-info', null);
+        return {};
+      }
+    }
+
+    function hashCode(str) {
+      var hash = 0,
+        i, chr;
+      if (str.length === 0)
+        return hash;
+      for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+        // Convert to 32bit integer
+      }
+      return hash;
+    }
+
+  });
 })();
