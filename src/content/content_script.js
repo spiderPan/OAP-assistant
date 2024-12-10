@@ -1,5 +1,5 @@
 (function () {
-    jQuery(function ($) {
+    document.addEventListener('DOMContentLoaded', function () {
         Firebase.enableLogging(true);
         var thisUrl       = document.URL,
             myFirebaseRef = new Firebase('https://resplendent-heat-2275.firebaseio.com/');
@@ -10,90 +10,88 @@
 
         if (thisUrl.indexOf('/course/view') >= 0) {
             //Course Landing Page
-            var courseID = GetURLVars('id');
+            var courseID = getURLVars('id');
             //TODO:reading data based on ID
-            ReadFireBase();
+            readFireBase();
         }
 
         if (thisUrl.indexOf('quiz/review') >= 0) {
             //Review Page
-            SetLocalStorage();
+            setLocalStorage();
         }
 
         if (thisUrl.indexOf('quiz/attempt') >= 0) {
             //Quiz Page
-            CheckReviewInfo();
-            ReadFireBase();
+            checkReviewInfo();
+            readFireBase();
         }
 
-        function SetLocalStorage() {
-            var cachedInfo = GetLocalStorage(),
-                reviewInfo = GetReviewInfo();
+        function setLocalStorage() {
+            var cachedInfo = getLocalStorage();
+            var reviewInfo = getReviewInfo();
 
-            if (null === cachedInfo) {
+            if (!cachedInfo) {
                 cachedInfo = {};
             }
 
-            for (var i in cachedInfo) {
-                if (reviewInfo.hasOwnProperty(i)) {
-                    delete reviewInfo.i;
+            for (var key in cachedInfo) {
+                if (reviewInfo.hasOwnProperty(key)) {
+                    delete reviewInfo[key];
                 }
             }
 
-            /*TODO: compare the two objects and delete the duplicated keys then merged into the localStorage*/
-            $.extend(cachedInfo, reviewInfo);
+            // Merging cachedInfo and reviewInfo into localStorage
+            Object.assign(cachedInfo, reviewInfo);
             localStorage.setItem('OAP-info', JSON.stringify(cachedInfo));
         }
 
-        function CheckReviewInfo() {
-            var questionList = $('.deferredfeedback'),
-                cachedInfo   = GetLocalStorage();
+        function checkReviewInfo() {
+            var questionList = document.querySelectorAll('.deferredfeedback');
+                cachedInfo   = getLocalStorage();
 
             questionList.each(function (e) {
-                var _this       = $(this),
-                    questions   = _this.find('.qtext p').html().trim(),
-                    answers     = _this.find('.answer .r0, .answer .r1'),
-                    contentWrap = _this.find('.content');
+                var questionText = questionElement.querySelector('.qtext p').textContent.trim();
+                var answers = questionElement.querySelectorAll('.answer .r0, .answer .r1');
+                var contentWrap = questionElement.querySelector('.content');
 
-                for (var q in cachedInfo) {
-                    if (questions == q) {
-                        /*TODO: Improve comparison*/
-                        contentWrap.append('<p class="outcome">DUDE! <strong>' + cachedInfo[q] + '</strong></p>');
-                        var correctAnswer = cachedInfo[q].replace('The correct answer is', '').replace(/'/g, '').replace(':', '').replace('.', '').trim();
+                for (var question in cachedInfo) {
+                    if (questionText === question) {
+                        contentWrap.insertAdjacentHTML('beforeend', '<p class="outcome">DUDE! <strong>' + cachedInfo[question] + '</strong></p>');
+                        var correctAnswer = cachedInfo[question]
+                            .replace('The correct answer is', '')
+                            .replace(/'/g, '')
+                            .replace(':', '')
+                            .replace('.', '')
+                            .trim();
 
-                        //TODO: Highlight the correct result
-                        answers.each(function (e) {
-                            var _that       = $(this),
-                                answerLabel = _that.find('label').html().trim();
-
-                            if (answerLabel.indexOf(correctAnswer) > -1) {
-                                _that.addClass('correct');
+                        // Highlight the correct result
+                        answers.forEach(function (answerElement) {
+                            var answerLabel = answerElement.querySelector('label').textContent.trim();
+                            if (answerLabel.includes(correctAnswer)) {
+                                answerElement.classList.add('correct');
                             }
-
                         });
                     }
                 }
-
             });
 
         }
 
-        function GetReviewInfo() {
-            var resultLists = $('.deferredfeedback'),
-                reviewInfo  = {};
+        function getReviewInfo() {
+            var resultLists = document.querySelectorAll('.deferredfeedback');
+            var reviewInfo = {};
 
-            resultLists.each(function (e) {
-                var _this     = $(this),
-                    questions = _this.find('.qtext p').html().trim(),
-                    answer    = _this.find('.rightanswer').html().trim();
-                reviewInfo[questions] = answer;
+            resultLists.forEach(function (resultElement) {
+                var questionText = resultElement.querySelector('.qtext p').textContent.trim();
+                var answerText = resultElement.querySelector('.rightanswer').textContent.trim();
+                reviewInfo[questionText] = answerText;
             });
 
             console.log(reviewInfo);
             return reviewInfo;
         }
 
-        function GetLocalStorage() {
+        function getLocalStorage() {
             var cachedInfo = localStorage.getItem('OAP-info');
 
             if (cachedInfo) {
@@ -104,13 +102,13 @@
             }
         }
 
-        function ReadFireBase(id) {
+        function readFireBase(id) {
             myFirebaseRef.child("location").on("value", function (snapshot) {
 
             });
         }
 
-        function GetURLVars(name) {
+        function getURLVars(name) {
             var vars   = [],
                 hash,
                 hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');

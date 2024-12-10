@@ -31,7 +31,6 @@
                 "*://oap.apprenticelms.ca/course/*"
             ],
             "js": [
-                "src/lib/jquery-2.2.4.min.js",
                 "src/lib/firebase.js",
                 "src/content/content_script.js"
             ],
